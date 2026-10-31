@@ -49,7 +49,7 @@
 
     <section class="seccion" id="temario">
       <h2>Qué puedes estudiar</h2>
-      <p class="bajada">Empezamos por la parte general que comparten casi todas las oposiciones. Cada pregunta se contrasta, artículo a artículo, con el texto consolidado del BOE antes de publicarse.</p>
+      <p class="bajada">La parte general que comparten casi todas las oposiciones: <b id="total-preguntas">la Constitución y las leyes básicas</b>. Cada pregunta se contrasta, artículo a artículo, con el texto consolidado del BOE antes de publicarse; la que no cuadra, no entra.</p>
       <ul class="leyes-lista" id="leyes-portada">
         <li>Constitución Española (título preliminar y título I) <span class="etiqueta ya">64 preguntas</span></li>
         <li>Ley 39/2015, del Procedimiento Administrativo Común <span class="etiqueta">próximamente</span></li>
@@ -85,6 +85,24 @@
       <details><summary>¿Cuánto cuesta?</summary><p>Ahora mismo es una beta gratuita. Cuando haya más leyes y oposiciones completas habrá una suscripción; lo que hayas estudiado no se pierde.</p></details>
     </section>
   </main>
+
+  <script>
+    // la lista de leyes sale del banco publicado: así la portada nunca se queda atrás
+    fetch("bancos/indice.json", { cache: "no-cache" }).then((r) => r.json()).then(({ leyes }) => {
+      const total = leyes.reduce((s, l) => s + l.n, 0);
+      const ul = document.getElementById("leyes-portada");
+      ul.textContent = "";
+      for (const l of leyes) {
+        const li = document.createElement("li");
+        const et = document.createElement("span");
+        et.className = "etiqueta ya";
+        et.textContent = `${l.n} preguntas`;
+        li.append(l.nombre, et);
+        ul.append(li);
+      }
+      document.getElementById("total-preguntas").textContent = `${total} preguntas de ${leyes.length} leyes`;
+    }).catch(() => {});
+  </script>
 
   <footer class="pie">
     <span>OposiVoz · beta</span>

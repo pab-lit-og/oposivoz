@@ -225,7 +225,9 @@ async function preguntar() {
   E.recientes.push(x.id);
   if (CONF.modo !== "simulacro") E.recientes = E.recientes.slice(-6);
   pintarPregunta();
-  if ((await hablar([`Pregunta ${E.numero}, de ${ley(x.ley).corto}.`, ...x.voz])) === "fin" && E.actual === x && !E.respondida) esperar();
+  const saludo = E.saludo ? [E.saludo] : [];
+  E.saludo = "";
+  if ((await hablar([...saludo, `Pregunta ${E.numero}, de ${ley(x.ley).corto}.`, ...x.voz])) === "fin" && E.actual === x && !E.respondida) esperar();
 }
 
 // tras leer la pregunta: si en 30 s no dices nada, un recordatorio (una vez)
@@ -348,9 +350,10 @@ async function empezar() {
   $("b-pausa").textContent = "Pausa";
   try { E.wake = await navigator.wakeLock?.request("screen"); } catch { /* sin bloqueo de pantalla */ }
   if (!puedeOir()) $("oido").textContent = textoSinMicro();
-  const saludo = CONF.modo === "simulacro" ? `Simulacro de ${SIMULACRO}. No te corrijo hasta el final.`
+  // el saludo va delante de la primera pregunta, que ya está en pantalla mientras suena
+  E.saludo = CONF.modo === "simulacro" ? `Simulacro de ${SIMULACRO}. No te corrijo hasta el final.`
     : CONF.modo === "falladas" ? "Vamos con las que has fallado." : "Vamos allá.";
-  if ((await hablar([saludo])) === "fin") preguntar();
+  preguntar();
 }
 
 function cerrarSesion() {

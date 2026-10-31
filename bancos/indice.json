@@ -13,6 +13,92 @@
    "n": 64,
    "version": "934cb27fc8",
    "actualizado": "2026-10-31"
+  },
+  {
+   "ley": "l39",
+   "nombre": "Ley 39/2015, del Procedimiento Administrativo Común",
+   "corto": "Ley 39/2015",
+   "claves": [
+    "39",
+    "procedimiento",
+    "administrativo comun",
+    "procedimiento administrativo"
+   ],
+   "n": 208,
+   "version": "47a6306271",
+   "actualizado": "2026-10-31"
+  },
+  {
+   "ley": "l40",
+   "nombre": "Ley 40/2015, de Régimen Jurídico del Sector Público",
+   "corto": "Ley 40/2015",
+   "claves": [
+    "40",
+    "regimen juridico",
+    "sector publico"
+   ],
+   "n": 262,
+   "version": "013d060398",
+   "actualizado": "2026-10-31"
+  },
+  {
+   "ley": "trebep",
+   "nombre": "Estatuto Básico del Empleado Público (RDL 5/2015)",
+   "corto": "TREBEP",
+   "claves": [
+    "trebep",
+    "ebep",
+    "estatuto basico",
+    "empleado publico",
+    "empleados publicos",
+    "funcionarios"
+   ],
+   "n": 152,
+   "version": "588e732068",
+   "actualizado": "2026-10-31"
+  },
+  {
+   "ley": "lopdgdd",
+   "nombre": "LO 3/2018 de Protección de Datos y garantía de los derechos digitales",
+   "corto": "Protección de datos",
+   "claves": [
+    "lopd",
+    "lopdgdd",
+    "proteccion de datos",
+    "datos personales",
+    "derechos digitales"
+   ],
+   "n": 165,
+   "version": "7ce11b830a",
+   "actualizado": "2026-10-31"
+  },
+  {
+   "ley": "loi",
+   "nombre": "LO 3/2007 para la igualdad efectiva de mujeres y hombres",
+   "corto": "Igualdad",
+   "claves": [
+    "igualdad",
+    "mujeres y hombres",
+    "3 2007"
+   ],
+   "n": 106,
+   "version": "fdcd739e51",
+   "actualizado": "2026-10-31"
+  },
+  {
+   "ley": "prl",
+   "nombre": "Ley 31/1995 de Prevención de Riesgos Laborales",
+   "corto": "Prevención de riesgos",
+   "claves": [
+    "prl",
+    "prevencion",
+    "riesgos laborales",
+    "riesgos",
+    "31 1995"
+   ],
+   "n": 93,
+   "version": "43392efd88",
+   "actualizado": "2026-10-31"
   }
  ]
 }

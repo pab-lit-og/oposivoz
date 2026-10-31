@@ -14,7 +14,7 @@
     --fondo: #f3f5f8; --superficie: #ffffff; --superficie-2: #e9edf2; --linea: #d5dbe3;
     --texto: #12161c; --suave: #4a5260; --tenue: #5d6573;
     --senal: #ffcc33; --senal-texto: #8a6400; --sobre-senal: #15120a;
-    --bien: #12855a; --mal: #c8402e;
+    --bien: #0e6d4a; --mal: #b33826;
     color-scheme: light;
   }
 }
@@ -22,7 +22,7 @@
   --fondo: #f3f5f8; --superficie: #ffffff; --superficie-2: #e9edf2; --linea: #d5dbe3;
   --texto: #12161c; --suave: #4a5260; --tenue: #5d6573;
   --senal: #ffcc33; --senal-texto: #8a6400; --sobre-senal: #15120a;
-  --bien: #12855a; --mal: #c8402e;
+  --bien: #0e6d4a; --mal: #b33826;
   color-scheme: light;
 }
 

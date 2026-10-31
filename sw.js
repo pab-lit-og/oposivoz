@@ -1,5 +1,5 @@
 // OposiVoz · funciona sin conexión (en el coche, en el metro): primero la red y, si no hay, lo último guardado.
-const CACHE = "oposivoz-e1bbd83";
+const CACHE = "oposivoz-9ab9ef4";
 const BASE = ["./", "index.html", "estudiar.html", "css/estilo.css", "css/fuentes.css", "js/motor.js", "js/app.js",
   "bancos/indice.json", "icono.svg", "manifest.webmanifest", "fuentes/atkinson-latin-400.woff2", "fuentes/atkinson-latin-700.woff2"];
 
