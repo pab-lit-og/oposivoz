@@ -1,0 +1,12 @@
+{
+  "name": "OposiVoz · estudia la oposición con la voz",
+  "short_name": "OposiVoz",
+  "description": "Test de oposiciones por voz y con las manos libres, con repaso de lo que fallas.",
+  "lang": "es",
+  "start_url": "estudiar.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0e1116",
+  "theme_color": "#0e1116",
+  "icons": [{ "src": "icono.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

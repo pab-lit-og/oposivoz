@@ -1,0 +1,18 @@
+{
+ "leyes": [
+  {
+   "ley": "ce",
+   "nombre": "Constitución Española",
+   "corto": "Constitución",
+   "claves": [
+    "constitucion",
+    "constitucional",
+    "ce",
+    "carta magna"
+   ],
+   "n": 64,
+   "version": "934cb27fc8",
+   "actualizado": "2026-10-31"
+  }
+ ]
+}
