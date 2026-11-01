@@ -6,10 +6,25 @@
 <meta name="theme-color" content="#0e1116">
 <title>OposiVoz · Estudia la oposición con la voz</title>
 <meta name="description" content="Test de oposiciones por voz y con las manos libres: te leo la pregunta, contestas en voz alta y lo que fallas vuelve hasta que lo sabes. Constitución, Ley 39/2015 y más.">
+<link rel="canonical" href="https://pab-lit-og.github.io/oposivoz/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_ES">
+<meta property="og:site_name" content="OposiVoz">
+<meta property="og:title" content="OposiVoz · Estudia la oposición con la voz">
+<meta property="og:description" content="Test de oposiciones por voz y con las manos libres: te leo la pregunta, contestas en voz alta y lo que fallas vuelve. Gratis y sin cuenta.">
+<meta property="og:url" content="https://pab-lit-og.github.io/oposivoz/">
+<meta property="og:image" content="https://pab-lit-og.github.io/oposivoz/og/oposivoz.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="icono.svg">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="preload" href="fuentes/atkinson-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fuentes/atkinson-latin-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="css/fuentes.css">
 <link rel="stylesheet" href="css/estilo.css">
+<script src="js/analitica.js" defer></script>
+<script src="js/opinion.js" defer></script>
 </head>
 <body>
 <div class="envoltura">
@@ -18,7 +33,7 @@
       <svg viewBox="0 0 64 64" aria-hidden="true"><g class="onda"><rect x="8" y="26" width="7" height="12" rx="3.5"/><rect x="19" y="18" width="7" height="28" rx="3.5"/><rect x="30" y="10" width="7" height="44" rx="3.5"/><rect x="41" y="20" width="7" height="24" rx="3.5"/><rect x="52" y="28" width="5" height="8" rx="2.5"/></g></svg>
       OposiVoz
     </a>
-    <div class="derecha"><a class="boton principal" href="estudiar.html">Empezar</a></div>
+    <div class="derecha"><a class="etiqueta beta" data-opinar href="https://github.com/pab-lit-og/oposivoz/issues/new">Beta · opinar</a><a class="boton principal" href="estudiar.html">Practicar</a></div>
   </header>
 
   <main>
@@ -49,15 +64,19 @@
 
     <section class="seccion" id="temario">
       <h2>Qué puedes estudiar</h2>
-      <p class="bajada">La parte general que comparten casi todas las oposiciones: <b id="total-preguntas">la Constitución y las leyes básicas</b>. Cada pregunta se contrasta, artículo a artículo, con el texto consolidado del BOE antes de publicarse; la que no cuadra, no entra.</p>
+      <p class="bajada">La parte general que comparten casi todas las oposiciones: <b id="total-preguntas">1050 preguntas de 7 leyes</b>. Cada pregunta se contrasta, artículo a artículo, con el texto consolidado del BOE antes de publicarse; la que no cuadra, no entra.</p>
       <ul class="leyes-lista" id="leyes-portada">
-        <li>Constitución Española (título preliminar y título I) <span class="etiqueta ya">64 preguntas</span></li>
-        <li>Ley 39/2015, del Procedimiento Administrativo Común <span class="etiqueta">próximamente</span></li>
-        <li>Ley 40/2015, de Régimen Jurídico del Sector Público <span class="etiqueta">próximamente</span></li>
-        <li>Estatuto Básico del Empleado Público <span class="etiqueta">próximamente</span></li>
-        <li>Protección de datos (LO 3/2018) <span class="etiqueta">próximamente</span></li>
-        <li>Igualdad (LO 3/2007) y Prevención de riesgos (Ley 31/1995) <span class="etiqueta">próximamente</span></li>
+        <!-- leyes:inicio -->
+        <li><a href="test/constitucion-espanola/">Constitución Española</a> <span class="etiqueta ya">64 preguntas</span></li>
+        <li><a href="test/ley-39-2015-procedimiento-administrativo-comun/">Ley 39/2015, del Procedimiento Administrativo Común</a> <span class="etiqueta ya">208 preguntas</span></li>
+        <li><a href="test/ley-40-2015-regimen-juridico-sector-publico/">Ley 40/2015, de Régimen Jurídico del Sector Público</a> <span class="etiqueta ya">262 preguntas</span></li>
+        <li><a href="test/trebep-estatuto-basico-empleado-publico/">Estatuto Básico del Empleado Público (RDL 5/2015)</a> <span class="etiqueta ya">152 preguntas</span></li>
+        <li><a href="test/lopdgdd-ley-organica-3-2018-proteccion-de-datos/">LO 3/2018 de Protección de Datos y garantía de los derechos digitales</a> <span class="etiqueta ya">165 preguntas</span></li>
+        <li><a href="test/ley-organica-3-2007-igualdad/">LO 3/2007 para la igualdad efectiva de mujeres y hombres</a> <span class="etiqueta ya">106 preguntas</span></li>
+        <li><a href="test/ley-31-1995-prevencion-riesgos-laborales/">Ley 31/1995 de Prevención de Riesgos Laborales</a> <span class="etiqueta ya">93 preguntas</span></li>
+        <!-- leyes:fin -->
       </ul>
+      <p style="margin-top:18px"><a href="test/">Ver los tests por ley y por título, con su respuesta y su artículo →</a></p>
     </section>
 
     <section class="seccion" id="por-que">
@@ -86,26 +105,11 @@
     </section>
   </main>
 
-  <script>
-    // la lista de leyes sale del banco publicado: así la portada nunca se queda atrás
-    fetch("bancos/indice.json", { cache: "no-cache" }).then((r) => r.json()).then(({ leyes }) => {
-      const total = leyes.reduce((s, l) => s + l.n, 0);
-      const ul = document.getElementById("leyes-portada");
-      ul.textContent = "";
-      for (const l of leyes) {
-        const li = document.createElement("li");
-        const et = document.createElement("span");
-        et.className = "etiqueta ya";
-        et.textContent = `${l.n} preguntas`;
-        li.append(l.nombre, et);
-        ul.append(li);
-      }
-      document.getElementById("total-preguntas").textContent = `${total} preguntas de ${leyes.length} leyes`;
-    }).catch(() => {});
-  </script>
 
   <footer class="pie">
     <span>OposiVoz · beta</span>
+    <a href="test/">Tests por ley</a>
+    <a data-opinar href="https://github.com/pab-lit-og/oposivoz/issues/new">Opinar o avisar de un fallo</a>
     <a href="aviso-legal.html">Aviso legal</a>
     <a href="privacidad.html">Privacidad</a>
     <span>Material de estudio no oficial: el texto vigente es el del BOE.</span>

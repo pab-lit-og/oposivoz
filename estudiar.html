@@ -5,8 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0e1116">
 <title>OposiVoz · Estudiar</title>
+<meta name="description" content="Test de oposiciones por voz: te leo la pregunta y las cuatro opciones, contestas en voz alta y lo que fallas vuelve. Gratis y sin cuenta.">
+<link rel="canonical" href="https://pab-lit-og.github.io/oposivoz/estudiar.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_ES">
+<meta property="og:site_name" content="OposiVoz">
+<meta property="og:title" content="OposiVoz · Test de oposiciones por voz">
+<meta property="og:description" content="Te leo la pregunta, contestas en voz alta y lo que fallas vuelve hasta que lo sabes. Constitución, leyes 39 y 40/2015, TREBEP y más. Gratis.">
+<meta property="og:url" content="https://pab-lit-og.github.io/oposivoz/estudiar.html">
+<meta property="og:image" content="https://pab-lit-og.github.io/oposivoz/og/oposivoz.png">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="icono.svg">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="preload" href="fuentes/atkinson-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fuentes/atkinson-latin-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="css/fuentes.css">
 <link rel="stylesheet" href="css/estilo.css">
 </head>
@@ -18,6 +30,7 @@
       OposiVoz
     </a>
     <div class="derecha">
+      <a class="etiqueta beta" data-opinar href="https://github.com/pab-lit-og/oposivoz/issues/new">Beta · opinar</a>
       <span class="estado" id="estado" data-e="listo"><i></i><span id="estado-txt">Preparado</span></span>
       <button class="icono" id="b-ajustes" aria-label="Ajustes" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7.4 7.4 0 0 0-1.7-1L15 3.5h-4l-.4 2.5a7.4 7.4 0 0 0-1.7 1l-2.4-1-2 3.4L6.6 11a7.6 7.6 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7.4 7.4 0 0 0 1.7 1l.4 2.5h4l.4-2.5a7.4 7.4 0 0 0 1.7-1l2.4 1 2-3.4-2.1-1.6zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg></button>
     </div>
@@ -27,7 +40,30 @@
     <!-- antes de empezar -->
     <section id="inicio">
       <h1 style="font-size:clamp(32px,5vw,48px);line-height:1.05;margin:8px 0 0;letter-spacing:-.02em">Hoy, por voz</h1>
-      <div class="cifras" id="cifras"></div>
+      <p class="reto-aviso" id="reto-aviso" hidden></p>
+      <p class="aviso-app" id="aviso-app" hidden>Estás dentro de otra app y aquí la voz suele fallar. Para hablarle, ábrelo en
+        Chrome o Safari (menú ⋯ → «Abrir en el navegador»). Mientras, puedes contestar tocando.
+        <button class="boton" id="copiar-enlace">Copiar enlace</button></p>
+      <p class="primera" id="primera" hidden>Pulsa <b>Empezar</b>: te leo una pregunta con sus cuatro opciones y contestas en voz
+        alta («la be», «no sé») o tocando la opción. La primera vez, el navegador te pedirá permiso para usar el micrófono.</p>
+      <div class="cifras" id="cifras"><div class="cifra"><b>…<span style="font-size:18px">/…</span></b><span>preguntas vistas</span></div><div class="cifra"><b>…</b><span>dominadas</span></div><div class="cifra"><b>…</b><span>repasos que tocan</span></div><div class="cifra"><b>—</b><span>nota estimada</span></div></div>
+      <script>
+        // lo de arriba se decide antes de pintar (app.js llega después): así la página no salta al cargar
+        (function () {
+          var $ = function (id) { return document.getElementById(id); };
+          try { var p = JSON.parse(localStorage.getItem("oposivoz.progreso.v1") || "null"); if (!(p && p.historial && p.historial.length)) $("primera").hidden = false; }
+          catch (e) { $("primera").hidden = false; }
+          if (/Instagram|FBAN|FBAV|FB_IAB|TikTok|musical_ly|BytedanceWebview|Snapchat|Line\/|; wv\)/i.test(navigator.userAgent)) $("aviso-app").hidden = false;
+          var q = new URLSearchParams(location.search), nota = Number(q.get("reto")), ley = (q.get("ley") || "").split(",");
+          var de = { ce: "la Constitución", l39: "la Ley 39/2015", l40: "la Ley 40/2015", trebep: "el TREBEP", lopdgdd: "protección de datos",
+            loi: "la Ley de Igualdad", prl: "prevención de riesgos laborales" };
+          if (q.get("reto") !== null && nota >= 0 && nota <= 100) {
+            $("reto-aviso").textContent = "Te han retado: " + String(nota / 10).replace(".", ",") + " en " +
+              (ley.length === 1 && de[ley[0]] ? de[ley[0]] : "la parte general") + ". ¿Lo superas? Pulsa «Empezar».";
+            $("reto-aviso").hidden = false;
+          }
+        })();
+      </script>
       <fieldset class="grupo">
         <legend>Qué te pregunto</legend>
         <div class="chips" id="modos">
@@ -35,6 +71,8 @@
           <button data-modo="ley" aria-pressed="false">Por ley</button>
           <button data-modo="falladas" aria-pressed="false">Solo falladas</button>
           <button data-modo="simulacro" aria-pressed="false">Simulacro de 20</button>
+          <button data-modo="examen" aria-pressed="false" data-pro hidden>Simulacro de 100<small>Pro</small></button>
+          <button data-modo="debiles" aria-pressed="false" data-pro hidden>Tus puntos débiles<small>Pro</small></button>
         </div>
         <div class="chips" id="leyes" style="margin-top:12px" hidden></div>
       </fieldset>
@@ -56,6 +94,7 @@
       <h2 class="enunciado" id="enunciado"></h2>
       <ol class="opciones" id="opciones"></ol>
       <div class="explicacion" id="explicacion" hidden></div>
+      <p class="fallo" id="fallo" hidden><a id="b-fallo" data-opinar href="https://github.com/pab-lit-og/oposivoz/issues/new">¿Ves un fallo en esta pregunta? Avísanos</a></p>
       <p class="oido" id="oido" aria-live="polite"></p>
       <div class="controles">
         <button class="boton" id="b-repite">Repetir</button>
@@ -72,6 +111,20 @@
       <p class="ayuda" id="final-texto" style="font-size:18px;color:var(--suave)"></p>
       <div class="cifras" id="final-cifras"></div>
       <table class="tabla" id="tabla-leyes"></table>
+      <div id="final-debiles"></div>
+      <div class="compartir" id="compartir" hidden>
+        <p class="reto-final" id="reto-final" hidden></p>
+        <div class="chips">
+          <button id="b-compartir">Compartir resultado</button>
+          <button id="b-retar">Reta a un compañero</button>
+        </div>
+        <div class="chips" id="compartir-mas" hidden>
+          <a class="boton" id="compartir-wa" target="_blank" rel="noopener">WhatsApp</a>
+          <a class="boton" id="compartir-tg" target="_blank" rel="noopener">Telegram</a>
+          <button id="compartir-copiar">Copiar enlace</button>
+        </div>
+        <p class="ayuda">Solo se comparte la nota y la ley: nada tuyo.</p>
+      </div>
       <button class="boton principal grande" id="otra">Otra tanda</button>
     </section>
   </main>
@@ -87,11 +140,30 @@
     <div class="chips"><button id="a-exportar">Copiar código</button><button id="a-importar">Pegar código</button></div>
     <textarea id="a-codigo" rows="3" placeholder="Pega aquí el código de otro dispositivo" hidden></textarea>
   </div>
+  <section class="pro" id="pro" hidden aria-labelledby="pro-titulo">
+    <h3 id="pro-titulo">OposiVoz Pro <span class="pruebas" id="pro-pruebas" hidden>Pruebas: no se cobra nada</span></h3>
+    <div id="pro-no">
+      <p>Simulacro de 100 preguntas, como el examen, y repaso solo de tus artículos más flojos. Todo lo de ahora sigue gratis.</p>
+      <div class="chips"><a class="boton" id="pro-mensual" target="_blank" rel="noopener" hidden>9,99 € al mes</a><a class="boton" id="pro-examen" target="_blank" rel="noopener" hidden>49 € hasta tu examen (un año)</a></div>
+      <label class="campo" style="margin-top:14px"><span>¿Ya tienes la clave?</span><input id="pro-clave" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="La del correo de Polar"></label>
+      <div class="chips"><button id="pro-activar">Activar</button></div>
+      <p class="ayuda" id="pro-aviso" aria-live="polite"></p>
+      <p class="ayuda">Pagas en Polar, que te factura y te manda la clave por correo. La clave se comprueba con Polar como mucho una vez al día; tu progreso sigue sin salir de este navegador.</p>
+    </div>
+    <div id="pro-si" hidden>
+      <p id="pro-estado"></p>
+      <div class="chips"><a class="boton" id="pro-portal" target="_blank" rel="noopener" hidden>Gestionar mi suscripción</a><button id="pro-quitar">Quitar de este navegador</button></div>
+    </div>
+  </section>
   <div class="chips"><button id="a-borrar" class="peligro">Borrar mi progreso</button><button id="a-cerrar">Cerrar</button></div>
 </aside>
 <div class="aviso-flotante" id="toast" role="status" aria-live="polite"></div>
 
+<script src="js/analitica.js"></script>
 <script src="js/motor.js"></script>
+<script src="js/opinion.js"></script>
+<script src="js/pro-config.js"></script>
+<script src="js/pro.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

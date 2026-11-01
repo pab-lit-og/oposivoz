@@ -17,11 +17,20 @@ const CONF = {
 };
 const E = {
   activo: false, pausa: false, numero: 0, actual: null, anterior: null, respondida: false, ultimo: null, recientes: [],
-  sesion: { aciertos: 0, fallos: 0, blancos: 0 }, racha: 0, consejo: false, avisoSilencio: false, nadas: 0,
+  sesion: { aciertos: 0, fallos: 0, blancos: 0 }, racha: 0, leyesSesion: new Set(), consejo: false, avisoSilencio: false, nadas: 0,
   hablando: false, vozFin: 0, inicioHabla: 0, sonando: "", sonandoAntes: "", silencio: null, wake: null,
 };
 let BANCO = [], LEYES = [];
 let P = cargarProgreso();
+
+// Pro (cobro con Polar): apagado en pro-config.js hasta el alta. Apagado, la web es la de siempre y no sale nada de pago.
+const PRO = window.Pro ? window.Pro.configurar(self.OPOSIVOZ_PRO, location) : { activo: false };
+let LICENCIA = guardado.get("oposivoz.licencia", null);
+const esPro = () => !!window.Pro && window.Pro.esPro(LICENCIA, PRO);
+const MODOS_PRO = new Set(["examen", "debiles"]);
+const esSim = () => CONF.modo === "simulacro" || CONF.modo === "examen";
+const tamSim = () => (CONF.modo === "examen" ? window.Pro.SIMULACRO_LARGO : SIMULACRO);
+if (MODOS_PRO.has(CONF.modo) && !esPro()) CONF.modo = "mixto";
 
 function cargarProgreso() {
   const p = guardado.get(CLAVE, null);
@@ -114,6 +123,7 @@ function escuchar() {
       for (let i = e.resultIndex; i < e.results.length; i++) if (e.results[i].isFinal) oir(e.results[i][0].transcript, E.inicioHabla);
     };
     rec.onerror = (e) => {
+      if (!["no-speech", "aborted"].includes(e.error)) falloMicro(e.error);
       if (e.error === "not-allowed" || e.error === "service-not-allowed") {
         micDenegado = true;
         sinMicro("El navegador no deja usar el micrófono. Contesta tocando la opción o con las teclas A–D.");
@@ -135,6 +145,19 @@ function dejarDeEscuchar() {
   if (rec && escuchando) { try { rec.abort(); } catch { /* ya parado */ } }
   escuchando = false;
 }
+// estadística anónima (js/analitica.js): qué pasa, nunca lo que dices; cada fallo del micro, una vez por visita
+const fallosMicro = new Set();
+function falloMicro(motivo) {
+  if (fallosMicro.has(motivo)) return;
+  fallosMicro.add(motivo);
+  window.medir?.("fallo_micro", { motivo });
+}
+function medirFin(como) {
+  const s = E.sesion, n = s.aciertos + s.fallos + s.blancos;
+  window.medir?.("fin_sesion", { como, modo: CONF.modo, preguntas: n, acierto: n ? Math.round((s.aciertos / n) * 100) : 0,
+    minutos: Math.round((Date.now() - E.inicio) / 60000) });
+}
+
 function sinMicro(msg) {
   $("sin-voz").textContent = msg; $("sin-voz").hidden = false;
   if (E.activo) $("oido").textContent = msg;
@@ -144,10 +167,10 @@ function sinMicro(msg) {
 // ------------------------------------------------------------------ pantalla
 function pintarMarcador() {
   const s = E.sesion;
-  $("contador").textContent = `Pregunta ${E.numero}${CONF.modo === "simulacro" ? ` de ${SIMULACRO}` : ""}`;
+  $("contador").textContent = `Pregunta ${E.numero}${esSim() ? ` de ${tamSim()}` : ""}`;
   $("m-bien").textContent = `✓ ${s.aciertos}`; $("m-mal").textContent = `✗ ${s.fallos}`; $("m-blanco").textContent = `– ${s.blancos}`;
   const n = M.nota([...Array(s.aciertos).fill("acierto"), ...Array(s.fallos).fill("fallo"), ...Array(s.blancos).fill("blanco")]);
-  $("m-nota").textContent = n === null || CONF.modo === "simulacro" ? "" : `nota ${coma(n)}`;
+  $("m-nota").textContent = n === null || esSim() ? "" : `nota ${coma(n)}`;
 }
 
 function pintarPregunta() {
@@ -165,7 +188,7 @@ function pintarPregunta() {
     b.addEventListener("click", () => responder(k));
     li.appendChild(b); $("opciones").appendChild(li);
   }
-  $("explicacion").hidden = true; $("b-sigue").hidden = true; $("b-nose").hidden = false;
+  $("explicacion").hidden = true; $("fallo").hidden = true; $("b-sigue").hidden = true; $("b-nose").hidden = false;
   $("oido").textContent = puedeOir() ? "" : textoSinMicro();
 }
 
@@ -173,20 +196,25 @@ function pintarCorreccion(letra, res) {
   const x = E.actual;
   for (const b of $("opciones").querySelectorAll("button")) {
     b.disabled = true;
-    if (CONF.modo === "simulacro") { if (b.dataset.letra === letra) b.classList.add("marcada"); continue; }
+    if (esSim()) { if (b.dataset.letra === letra) b.classList.add("marcada"); continue; }
     if (b.dataset.letra === x.correcta) b.classList.add("bien");
     else if (b.dataset.letra === letra) b.classList.add("mal");
   }
-  if (CONF.modo !== "simulacro") {
+  if (!esSim()) {
     $("explicacion").innerHTML = "";
     $("explicacion").append(document.createTextNode(x.explicacion));
     const c = document.createElement("cite"); c.textContent = `${ley(x.ley).nombre || ley(x.ley).corto}, ${x.cita}`;
     $("explicacion").append(c);
     $("explicacion").hidden = false;
+    if (self.enlaceOpinion) {   // avisar de un fallo en esta pregunta, con su id ya puesto
+      $("b-fallo").href = self.enlaceOpinion({ pregunta: x.id, ley: x.ley, articulo: x.articulo, enunciado: x.enunciado });
+      $("b-fallo").target = "_blank"; $("b-fallo").rel = "noopener";
+      $("fallo").hidden = false;
+    }
   }
   $("b-sigue").hidden = false; $("b-nose").hidden = true;
   pintarMarcador();
-  if (res === "acierto" && CONF.modo !== "simulacro") $("oido").textContent = "";
+  if (res === "acierto" && !esSim()) $("oido").textContent = "";
 }
 
 function cifras(r) {
@@ -197,7 +225,10 @@ function cifras(r) {
 
 function pintarInicio() {
   $("cifras").innerHTML = cifras(M.resumen(P, BANCO, LEYES));
-  for (const b of $("modos").querySelectorAll("button")) b.setAttribute("aria-pressed", String(b.dataset.modo === CONF.modo));
+  for (const b of $("modos").querySelectorAll("button")) {
+    b.setAttribute("aria-pressed", String(b.dataset.modo === CONF.modo));
+    if (b.hasAttribute("data-pro")) b.hidden = !PRO.activo;
+  }
   $("leyes").hidden = CONF.modo !== "ley";
   $("leyes").innerHTML = LEYES.map((l) => `<button data-ley="${l.ley}" aria-pressed="${CONF.leyes.includes(l.ley)}">${l.corto}<small>${l.n}</small></button>`).join("");
 }
@@ -205,14 +236,15 @@ function pintarInicio() {
 // ------------------------------------------------------------------ el examen
 function siguientePregunta() {
   return M.elegir(P, BANCO, {
-    modo: CONF.modo === "ley" ? "mixto" : CONF.modo, leyes: CONF.modo === "ley" ? CONF.leyes : null, excluir: E.recientes,
+    modo: esSim() ? "simulacro" : CONF.modo === "falladas" ? "falladas" : "mixto",
+    leyes: CONF.modo === "ley" ? CONF.leyes : null, ids: CONF.modo === "debiles" ? E.debiles : null, excluir: E.recientes,
   });
 }
 
 async function preguntar() {
   if (!E.activo || E.pausa) return;
   clearTimeout(E.silencio);
-  if (CONF.modo === "simulacro" && E.numero >= SIMULACRO) return terminar();
+  if (esSim() && E.numero >= tamSim()) return terminar();
   const x = siguientePregunta();
   if (!x) {
     E.respondida = true;
@@ -222,8 +254,8 @@ async function preguntar() {
   }
   E.anterior = E.ultimo ? { explicaVoz: [`Es la ${M.DICHO[E.actual.correcta]}.`, ...E.actual.voz_explicacion] } : null;
   E.actual = x; E.respondida = false; E.ultimo = null; E.numero++; E.avisoSilencio = false; E.nadas = 0;
-  E.recientes.push(x.id);
-  if (CONF.modo !== "simulacro") E.recientes = E.recientes.slice(-6);
+  E.recientes.push(x.id); E.leyesSesion.add(x.ley);
+  if (!esSim()) E.recientes = E.recientes.slice(-6);
   pintarPregunta();
   const saludo = E.saludo ? [E.saludo] : [];
   E.saludo = "";
@@ -249,13 +281,14 @@ function continuar(pausaMs = 800) {
   setTimeout(() => { if (E.actual === x && E.respondida && !E.hablando && !E.pausa) preguntar(); }, pausaMs);
 }
 
-async function responder(letra) {
+async function responder(letra, via = "toque") {
   if (!E.activo || !E.actual || E.respondida) return;
   E.respondida = true; clearTimeout(E.silencio); cortarVoz();
   const x = E.actual;
-  const sim = CONF.modo === "simulacro";
+  const sim = esSim();
   const r = M.registrar(P, x.id, letra, x.correcta, { simulacro: sim });
   guardar();
+  window.medir?.("respuesta", { resultado: r.res, via, modo: CONF.modo, ley: x.ley });
   if (r.res === "acierto") { E.sesion.aciertos++; E.racha++; }
   else { E.sesion[r.res === "fallo" ? "fallos" : "blancos"]++; E.racha = 0; }
   const voz = sim ? ["Apuntada."] : M.vozCorreccion(x, r.res, { racha: E.racha, explicarAciertos: CONF.explicar });
@@ -292,11 +325,11 @@ async function oir(texto, tInicio) {
       if (E.pausa) return pausar(false);
       if (E.respondida) return preguntar();
       return;
-    case "respuesta": return responder(it.letra);
+    case "respuesta": return responder(it.letra, "voz");
     case "no_se":
       if (E.respondida) return;
-      if (!E.consejo && CONF.modo !== "simulacro") { E.consejo = true; return decirYSeguir([M.CONSEJO_NO_SE]); }
-      return responder(null);
+      if (!E.consejo && !esSim()) { E.consejo = true; return decirYSeguir([M.CONSEJO_NO_SE]); }
+      return responder(null, "voz");
     case "repite":
       if (E.pausa) pausar(false, false);
       return decirYSeguir(E.respondida && E.ultimo ? E.ultimo.voz : [`Pregunta ${E.numero}.`, ...E.actual.voz]);
@@ -343,16 +376,30 @@ function pausar(si, hablarAlSeguir = true) {
 async function empezar() {
   guardarConf();
   if (CONF.modo === "ley" && !CONF.leyes.length) { aviso("Elige al menos una ley."); return; }
-  if (!BANCO.length) { aviso("Aún no se han cargado las preguntas."); return; }
+  if (!BANCO.length) {   // en un móvil lento las preguntas pueden tardar un poco: se espera en vez de rechazar
+    aviso("Un momento, cargando las preguntas…");
+    await CARGA;
+    if (!BANCO.length) return;
+  }
+  if (MODOS_PRO.has(CONF.modo) && !esPro()) { abrirPro(); return; }
+  if (CONF.modo === "debiles") {
+    const d = M.puntosDebiles(P, BANCO);
+    if (!d.length) { aviso("Aún no hay puntos débiles: contesta unas cuantas más y vuelve."); return; }
+    E.debiles = d.flatMap((a) => a.ids); E.nDebiles = d.length;
+  }
   E.activo = true; E.pausa = false; E.numero = 0; E.sesion = { aciertos: 0, fallos: 0, blancos: 0 }; E.racha = 0;
-  E.recientes = []; E.consejo = false; E.actual = null; E.anterior = null; E.ultimo = null;
+  E.recientes = []; E.consejo = false; E.actual = null; E.anterior = null; E.ultimo = null; E.inicio = Date.now();
+  E.leyesSesion = new Set();
+  window.medir?.("inicio_test", { modo: CONF.modo, voz: puedeOir() ? "si" : "no" });
+  if (!SR) falloMicro("navegador_sin_reconocimiento");
   $("inicio").hidden = true; $("final").hidden = true; $("examen").hidden = false;
   $("b-pausa").textContent = "Pausa";
   try { E.wake = await navigator.wakeLock?.request("screen"); } catch { /* sin bloqueo de pantalla */ }
   if (!puedeOir()) $("oido").textContent = textoSinMicro();
   // el saludo va delante de la primera pregunta, que ya está en pantalla mientras suena
-  E.saludo = CONF.modo === "simulacro" ? `Simulacro de ${SIMULACRO}. No te corrijo hasta el final.`
-    : CONF.modo === "falladas" ? "Vamos con las que has fallado." : "Vamos allá.";
+  E.saludo = esSim() ? `Simulacro de ${tamSim()}. No te corrijo hasta el final.`
+    : CONF.modo === "falladas" ? "Vamos con las que has fallado."
+    : CONF.modo === "debiles" ? `Vamos con tus ${E.nDebiles} artículos más flojos.` : "Vamos allá.";
   preguntar();
 }
 
@@ -370,6 +417,7 @@ async function terminar() {
   E.activo = false; clearTimeout(E.silencio); cortarVoz(); dejarDeEscuchar();
   try { E.wake?.release(); } catch { /* ya liberado */ }
   cerrarSesion();
+  medirFin("terminada");
   const s = E.sesion, n = s.aciertos + s.fallos + s.blancos;
   const voz = M.vozResumen(s);
   const r = M.resumen(P, BANCO, LEYES);
@@ -380,9 +428,69 @@ async function terminar() {
   const filas = r.leyes.filter((l) => l.vistas);
   $("tabla-leyes").innerHTML = filas.length ? `<tr><th>Ley</th><th>Vistas</th><th>Acierto</th><th>Dominadas</th></tr>` +
     filas.map((l) => `<tr><td>${l.corto}</td><td class="num">${l.vistas}/${l.n}</td><td class="num">${l.acierto ?? "—"} %</td><td class="num">${l.dominadas}</td></tr>`).join("") : "";
+  pintarDebiles();
+  pintarCompartir(s, n);
   estado("listo");
   await hablar(voz);
 }
+
+// ------------------------------------------------------------------ compartir el resultado y retar (sin datos personales)
+// El enlace solo lleva la ley y la nota: estudiar.html?ley=l39&reto=75 abre la misma ley y enseña la nota a batir.
+const WEB = "https://pab-lit-og.github.io/oposivoz/";
+const RETO = (() => {
+  const q = new URLSearchParams(location.search);
+  const nota = Number(q.get("reto"));
+  return { leyes: (q.get("ley") || "").split(",").filter(Boolean), nota: nota >= 0 && nota <= 100 ? nota / 10 : null };
+})();
+function enlaceReto(leyes, nota) {
+  const q = new URLSearchParams();
+  if (leyes.length === 1) q.set("ley", leyes[0]);
+  if (nota !== null) q.set("reto", String(Math.round(nota * 10)));
+  return `${WEB}estudiar.html${q.toString() ? "?" + q : ""}`;
+}
+const DE_QUE = { ce: "la Constitución", l39: "la Ley 39/2015", l40: "la Ley 40/2015", trebep: "el TREBEP",
+  lopdgdd: "protección de datos", loi: "la Ley de Igualdad", prl: "prevención de riesgos laborales" };
+function deQue(leyes) {
+  return leyes.length === 1 ? DE_QUE[leyes[0]] || ley(leyes[0]).corto : "la parte general";
+}
+function pintarCompartir(s, n) {
+  $("compartir").hidden = !n;
+  $("compartir-mas").hidden = true;
+  if (!n) return;
+  const leyes = [...E.leyesSesion];
+  const nota = M.nota([...Array(s.aciertos).fill("acierto"), ...Array(s.fallos).fill("fallo"), ...Array(s.blancos).fill("blanco")]);
+  E.compartir = { leyes, nota, n, aciertos: s.aciertos, url: enlaceReto(leyes, nota) };
+  const reto = RETO.nota !== null && leyes.length === 1 && RETO.leyes.includes(leyes[0]) ? RETO.nota : null;
+  $("reto-final").hidden = reto === null;
+  if (reto !== null) {
+    $("reto-final").textContent = nota > reto ? `¡Reto superado! Tu ${coma(nota)} gana al ${coma(reto)}.`
+      : nota === reto ? `Empate a ${coma(nota)}.` : `Te has quedado a ${coma(Math.round((reto - nota) * 10) / 10)} del reto (${coma(reto)}).`;
+  }
+}
+async function compartir(tipo) {
+  const c = E.compartir;
+  if (!c) return;
+  const de = deQue(c.leyes);
+  const texto = tipo === "reto"
+    ? `Te reto a un test de ${de} por voz en OposiVoz: yo he sacado un ${coma(c.nota)}. ¿Me ganas?`
+    : `He sacado un ${coma(c.nota)} en un test de ${de} con OposiVoz (${c.aciertos} de ${c.n}, contestando por voz). ¿Me superas?`;
+  window.medir?.("compartir", { tipo });
+  if (navigator.share) {
+    try { await navigator.share({ title: "OposiVoz", text: texto, url: c.url }); return; }
+    catch (e) { if (e && e.name === "AbortError") return; }
+  }
+  const todo = `${texto} ${c.url}`;
+  $("compartir-wa").href = `https://wa.me/?text=${encodeURIComponent(todo)}`;
+  $("compartir-tg").href = `https://t.me/share/url?url=${encodeURIComponent(c.url)}&text=${encodeURIComponent(texto)}`;
+  $("compartir-mas").hidden = false;
+  E.compartirTexto = todo;
+}
+$("b-compartir").addEventListener("click", () => compartir("resultado"));
+$("b-retar").addEventListener("click", () => compartir("reto"));
+$("compartir-copiar").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(E.compartirTexto || ""); aviso("Copiado: pégalo donde quieras."); }
+  catch { aviso("No se ha podido copiar."); }
+});
 
 // ------------------------------------------------------------------ ajustes: voz, micro y llevar el progreso
 function codigoDe(p) { return "OV1:" + btoa(unescape(encodeURIComponent(JSON.stringify(p)))); }
@@ -423,10 +531,85 @@ $("a-borrar").addEventListener("click", () => {
   P = M.nuevoProgreso(); guardar(); pintarInicio(); aviso("Progreso borrado.");
 });
 
+// ------------------------------------------------------------------ Pro: la clave de Polar
+function pintarDebiles() {
+  const caja = $("final-debiles");
+  caja.innerHTML = "";
+  if (!PRO.activo) return;
+  const d = M.puntosDebiles(P, BANCO);
+  if (!esPro()) {
+    if (d.length) caja.innerHTML = `<p class="ayuda">Tienes ${d.length} artículo${d.length > 1 ? "s" : ""} por debajo del 70 %. Con Pro, «Tus puntos débiles» te pregunta solo de ellos.</p>`;
+    return;
+  }
+  if (!d.length) return;
+  caja.innerHTML = `<h2 class="subtitulo">Tus puntos débiles</h2><table class="tabla"><tr><th>Artículo</th><th>Acierto</th><th>Preguntas</th></tr>` +
+    d.map((a) => `<tr><td>Art. ${a.articulo} · ${ley(a.ley).corto}</td><td class="num">${a.acierto} %</td><td class="num">${a.ids.length}</td></tr>`).join("") + "</table>";
+}
+
+function pintarPro() {
+  $("pro").hidden = !PRO.activo;
+  if (!PRO.activo) return;
+  $("pro-pruebas").hidden = PRO.entorno !== "sandbox";
+  const si = esPro();
+  $("pro-no").hidden = si; $("pro-si").hidden = !si;
+  for (const [id, url] of [["pro-mensual", PRO.pago?.mensual], ["pro-examen", PRO.pago?.examen], ["pro-portal", PRO.portal]]) {
+    $(id).hidden = !url; if (url) $(id).href = url;
+  }
+  if (si) {
+    const f = new Date(LICENCIA.comprobada).toLocaleDateString("es-ES");
+    const cad = LICENCIA.caduca ? ` · válida hasta el ${new Date(LICENCIA.caduca).toLocaleDateString("es-ES")}` : "";
+    $("pro-estado").textContent = `Pro activo en este navegador · clave ${LICENCIA.mostrar} · comprobada el ${f}${cad}.`;
+  } else if (LICENCIA && LICENCIA.estado !== "granted") {
+    $("pro-aviso").textContent = window.Pro.MENSAJES.revocada;
+  }
+}
+function abrirPro() {
+  abrirAjustes(true);
+  $("pro").scrollIntoView({ block: "start" });
+  if (!esPro()) aviso("Eso es de OposiVoz Pro.");
+}
+function guardarLicencia(lic) {
+  LICENCIA = lic;
+  if (lic) guardado.set("oposivoz.licencia", lic);
+  else try { localStorage.removeItem("oposivoz.licencia"); } catch { /* nada que borrar */ }
+}
+function etiquetaDispositivo() {
+  const so = navigator.userAgentData?.platform || (/(Android|iPhone|iPad|Windows|Mac|Linux)/.exec(navigator.userAgent) || ["navegador"])[0];
+  return `OposiVoz · ${so} · ${new Date().toLocaleDateString("es-ES")}`;
+}
+$("pro-activar").addEventListener("click", async () => {
+  const b = $("pro-activar");
+  b.disabled = true; $("pro-aviso").textContent = "Comprobando la clave…";
+  const r = await window.Pro.activar($("pro-clave").value, PRO, { etiqueta: etiquetaDispositivo() });
+  b.disabled = false;
+  if (r.licencia && !r.error) {
+    guardarLicencia(r.licencia); $("pro-clave").value = ""; $("pro-aviso").textContent = "";
+    aviso("Pro activado. ¡A por ello!"); pintarPro(); pintarInicio();
+  } else {
+    $("pro-aviso").textContent = window.Pro.MENSAJES[r.error] || window.Pro.MENSAJES.red;
+  }
+});
+$("pro-quitar").addEventListener("click", async () => {
+  if (!confirm("¿Quitar Pro de este navegador? Podrás activar la clave en otro dispositivo.")) return;
+  await window.Pro.quitar(LICENCIA, PRO);
+  guardarLicencia(null);
+  if (MODOS_PRO.has(CONF.modo)) { CONF.modo = "mixto"; guardarConf(); }
+  pintarPro(); pintarInicio(); aviso("Pro quitado de este navegador.");
+});
+async function comprobarLicencia() {
+  if (!PRO.activo || !LICENCIA || !window.Pro.tocaComprobar(LICENCIA)) return;
+  const r = await window.Pro.comprobar(LICENCIA, PRO);
+  if (!r.sinRed) guardarLicencia(r.licencia);
+  if (MODOS_PRO.has(CONF.modo) && !esPro()) { CONF.modo = "mixto"; guardarConf(); }
+  pintarPro(); pintarInicio();
+}
+
 // ------------------------------------------------------------------ eventos
 $("modos").addEventListener("click", (e) => {
   const b = e.target.closest("button[data-modo]");
-  if (b) { CONF.modo = b.dataset.modo; guardarConf(); pintarInicio(); }
+  if (!b) return;
+  if (MODOS_PRO.has(b.dataset.modo) && !esPro()) { abrirPro(); return; }
+  CONF.modo = b.dataset.modo; guardarConf(); pintarInicio();
 });
 $("leyes").addEventListener("click", (e) => {
   const b = e.target.closest("button[data-ley]");
@@ -446,14 +629,15 @@ document.addEventListener("keydown", (e) => {
   if (!E.activo || (e.target instanceof Element && e.target.closest("input, textarea, select")) || e.ctrlKey || e.metaKey || e.altKey) return;
   const k = e.key.toLowerCase();
   const letra = { a: "a", b: "b", c: "c", d: "d", 1: "a", 2: "b", 3: "c", 4: "d" }[k];
-  if (letra) responder(letra);
-  else if (k === "n") responder(null);
+  if (letra) responder(letra, "teclado");
+  else if (k === "n") responder(null, "teclado");
   else if (k === "r") $("b-repite").click();
   else if (k === "enter" && E.respondida) $("b-sigue").click();
   else if (k === " ") pausar(!E.pausa);
   else return;
   e.preventDefault();
 });
+window.addEventListener("pagehide", () => { if (E.activo) medirFin("cerrada"); });   // cerrar la pestaña a media sesión
 document.addEventListener("visibilitychange", async () => {
   if (document.visibilityState === "visible" && E.activo) try { E.wake = await navigator.wakeLock?.request("screen"); } catch { /* sin bloqueo */ }
 });
@@ -462,11 +646,15 @@ document.addEventListener("visibilitychange", async () => {
 async function cargarBancos() {
   try {
     const ind = await fetch("bancos/indice.json", { cache: "no-cache" }).then((r) => r.json());
-    LEYES = ind.leyes;
+    // las leyes marcadas «pro» en el índice solo se cargan con Pro (con el cobro apagado no hay ninguna así)
+    LEYES = ind.leyes.filter((l) => !(PRO.activo && l.pro && !esPro()));
     const bancos = await Promise.all(LEYES.map((l) => fetch(`bancos/${l.ley}.json?v=${l.version}`).then((r) => r.json())));
     bancos.forEach((b, i) => { LEYES[i].nombre = b.nombre; });
     BANCO = bancos.flatMap((b) => b.preguntas);
     CONF.leyes = CONF.leyes.filter((id) => LEYES.some((l) => l.ley === id));
+    // enlace directo a una ley (desde las páginas de test o un reto): la deja elegida, sin empezar sola
+    const pedidas = RETO.leyes.filter((id) => LEYES.some((l) => l.ley === id));
+    if (pedidas.length) { CONF.modo = "ley"; CONF.leyes = pedidas; guardarConf(); }
   } catch {
     aviso("No se han podido cargar las preguntas. Revisa la conexión.");
   }
@@ -477,5 +665,14 @@ if (HAY_VOZ) { cargarVoces(); speechSynthesis.addEventListener?.("voiceschanged"
 if (!HAY_VOZ) sinMicro("Este navegador no puede leer en voz alta: verás las preguntas en pantalla.");
 else if (!SR) { $("sin-voz").textContent = "Este navegador no reconoce la voz: contestarás tocando la opción (Chrome, Edge y Safari sí la reconocen)."; $("sin-voz").hidden = false; }
 if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("sw.js").catch(() => {});
+// la primera visita, el aviso de «ábrelo en el navegador» (Instagram, TikTok…) y el reto los enseña estudiar.html antes de
+// pintar; aquí solo se cuenta lo de la app
+if (!$("aviso-app").hidden) window.medir?.("fallo_micro", { motivo: "navegador_de_app" });
+$("copiar-enlace").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(location.href); aviso("Enlace copiado: pégalo en Chrome o Safari."); }
+  catch { aviso("Mantén pulsada la barra de direcciones para copiarlo."); }
+});
 estado("listo");
-cargarBancos();
+pintarPro();
+const CARGA = cargarBancos();
+comprobarLicencia();

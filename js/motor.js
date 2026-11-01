@@ -85,9 +85,10 @@
   }
 
   // Primero los repasos que tocan (las falladas vuelven), luego nuevas; en simulacro, cualquiera.
-  function elegir(p, preguntas, { modo = "mixto", leyes = null, excluir = [], rnd = Math.random, ahora = new Date() } = {}) {
+  function elegir(p, preguntas, { modo = "mixto", leyes = null, ids = null, excluir = [], rnd = Math.random, ahora = new Date() } = {}) {
     const fuera = new Set(excluir);
-    const pool = preguntas.filter((x) => (!leyes || !leyes.length || leyes.includes(x.ley)) && !fuera.has(x.id));
+    const solo = ids ? new Set(ids) : null;
+    const pool = preguntas.filter((x) => (!leyes || !leyes.length || leyes.includes(x.ley)) && (!solo || solo.has(x.id)) && !fuera.has(x.id));
     if (!pool.length) return null;
     const q = p.preguntas;
     const t = iso(ahora);
@@ -103,6 +104,26 @@
     if (vencidas.length && (!nuevas.length || rnd() < 0.7)) return vencidas[0];
     if (nuevas.length) return elegirPeso(nuevas, rnd);
     return pool.slice().sort((a, b) => (q[a.id].proxima || "").localeCompare(q[b.id].proxima || ""))[0];
+  }
+
+  // Los artículos que peor llevas (Pro): con al menos `minVistas` respuestas y menos de un 70 % de acierto, del peor
+  // al menos malo. Cada uno trae todas sus preguntas (también las que aún no has visto) para repasarlo entero.
+  function puntosDebiles(p, preguntas, { max = 6, minVistas = 2, umbral = 70 } = {}) {
+    const q = p.preguntas;
+    const porArt = new Map();
+    for (const x of preguntas) {
+      const k = `${x.ley}|${String(x.articulo).split(".")[0]}`;
+      if (!porArt.has(k)) porArt.set(k, { ley: x.ley, articulo: String(x.articulo).split(".")[0], ids: [], vistas: 0, aciertos: 0, fallos: 0 });
+      const a = porArt.get(k);
+      a.ids.push(x.id);
+      const e = q[x.id];
+      if (e && e.vistas) { a.vistas += e.vistas; a.aciertos += e.aciertos; a.fallos += e.fallos + e.blancos; }
+    }
+    return [...porArt.values()]
+      .filter((a) => a.vistas >= minVistas && a.aciertos / a.vistas * 100 < umbral)
+      .map((a) => ({ ...a, acierto: Math.round(a.aciertos / a.vistas * 100) }))
+      .sort((a, b) => a.acierto - b.acierto || b.fallos - a.fallos)
+      .slice(0, max);
   }
 
   // ------------------------------------------------------------------ qué ha querido decir
@@ -249,5 +270,5 @@
   }
 
   return { LETRAS, DICHO, PENALIZACION, INTERVALO_DIAS, REPESCA_MIN, CONSEJO_NO_SE, normaliza, nuevoProgreso, registrar,
-    nota, resumen, elegir, interpretar, esEco, vozCorreccion, vozResumen, vozComoVoy };
+    nota, resumen, elegir, puntosDebiles, interpretar, esEco, vozCorreccion, vozResumen, vozComoVoy };
 });
