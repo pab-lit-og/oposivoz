@@ -1,6 +1,6 @@
 // OposiVoz · funciona sin conexión (en el coche, en el metro): primero la red y, si no hay, lo último guardado.
-const CACHE = "oposivoz-22602d7";
-const BASE = ["./", "index.html", "estudiar.html", "css/estilo.css", "css/fuentes.css", "js/motor.js", "js/opinion.js", "js/pro-config.js", "js/pro.js", "js/app.js",
+const CACHE = "oposivoz-9fcef61";
+const BASE = ["./", "index.html", "estudiar.html", "css/estilo.css", "css/fuentes.css", "css/portada.css", "js/portada.js", "js/motor.js", "js/opinion.js", "js/pro-config.js", "js/pro.js", "js/app.js",
   "js/analitica.js", "bancos/indice.json", "icono.svg", "manifest.webmanifest", "fuentes/atkinson-latin-400.woff2", "fuentes/atkinson-latin-700.woff2"];
 
 self.addEventListener("install", (e) => {
@@ -11,7 +11,7 @@ self.addEventListener("activate", (e) => {
 });
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
-  if (e.request.method !== "GET" || url.origin !== location.origin) return;
+  if (e.request.method !== "GET" || url.origin !== location.origin || url.pathname.includes("/media/")) return;   // los vídeos van directos: con Range, la caché rompe Safari
   e.respondWith(fetch(e.request).then((r) => {
     if (r.ok) { const copia = r.clone(); caches.open(CACHE).then((c) => c.put(e.request, copia)); }
     return r;

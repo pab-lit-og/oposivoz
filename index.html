@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0e1116">
+<meta name="theme-color" content="#ffcc33">
 <title>OposiVoz · Estudia la oposición con la voz</title>
 <meta name="description" content="Test de oposiciones por voz y con las manos libres: te leo la pregunta, contestas en voz alta y lo que fallas vuelve hasta que lo sabes. Constitución, Ley 39/2015 y más.">
 <link rel="canonical" href="https://pab-lit-og.github.io/oposivoz/">
@@ -20,51 +20,88 @@
 <link rel="icon" type="image/svg+xml" href="icono.svg">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preload" href="fuentes/atkinson-latin-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="fuentes/atkinson-latin-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="css/fuentes.css">
-<link rel="stylesheet" href="css/estilo.css">
+<link rel="stylesheet" href="css/portada.css">
 <script src="js/analitica.js" defer></script>
 <script src="js/opinion.js" defer></script>
+<script src="js/portada.js" defer></script>
 </head>
 <body>
-<div class="envoltura">
-  <header class="barra">
-    <a class="marca" href="./" aria-label="OposiVoz, inicio">
-      <svg viewBox="0 0 64 64" aria-hidden="true"><g class="onda"><rect x="8" y="26" width="7" height="12" rx="3.5"/><rect x="19" y="18" width="7" height="28" rx="3.5"/><rect x="30" y="10" width="7" height="44" rx="3.5"/><rect x="41" y="20" width="7" height="24" rx="3.5"/><rect x="52" y="28" width="5" height="8" rx="2.5"/></g></svg>
-      OposiVoz
-    </a>
-    <div class="derecha"><a class="etiqueta beta" data-opinar href="https://github.com/pab-lit-og/oposivoz/issues/new">Beta · opinar</a><a class="boton principal" href="estudiar.html">Practicar</a></div>
-  </header>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="marca" viewBox="0 0 64 64"><rect x="8" y="26" width="7" height="12"/><rect x="19" y="18" width="7" height="28"/><rect x="30" y="10" width="7" height="44"/><rect x="41" y="20" width="7" height="24"/><rect x="52" y="28" width="5" height="8"/></symbol></svg>
 
-  <main>
-    <section class="heroe">
-      <div>
-        <h1>Estudia la oposición <span>con la voz.</span></h1>
-        <p class="entradilla">Te leo la pregunta y las cuatro opciones; contestas en voz alta. Lo que fallas vuelve a salir hasta que lo sabes. En el coche, andando o en el gimnasio.</p>
-        <a class="boton principal grande" href="estudiar.html">Probar gratis</a>
-        <p class="nota">Beta gratuita · sin cuenta · tu progreso se queda en tu móvil</p>
-      </div>
-      <div class="charla" aria-label="Ejemplo de una pregunta por voz">
-        <div class="globo voz"><span class="quien">OposiVoz</span>Pregunta 3, de la Constitución. La forma política del Estado español es… A: la Monarquía parlamentaria. Be: el Estado social y democrático de Derecho…</div>
-        <div class="globo tu"><span class="quien">Tú</span>La a.</div>
-        <div class="globo voz"><span class="quien">OposiVoz</span><span class="bien">¡Eso es!</span> Artículo 1.3. «Estado social y democrático de Derecho» es la definición del 1.1, no la forma política.</div>
-        <div class="globo tu"><span class="quien">Tú</span>Siguiente.</div>
-      </div>
-    </section>
+<header class="barra">
+  <a class="logo" href="./" aria-label="OposiVoz, inicio"><svg aria-hidden="true"><use href="#marca"/></svg>OposiVoz</a>
+  <a class="opinar" data-opinar href="https://github.com/pab-lit-og/oposivoz/issues/new">Beta: opinar</a>
+</header>
 
-    <section class="seccion" id="como">
-      <h2>Cómo funciona</h2>
-      <p class="bajada">Sin mirar la pantalla. Funciona en el navegador del móvil o del ordenador; no hay que instalar nada.</p>
-      <div class="rejilla">
-        <div class="ficha"><span class="paso">1 · ESCUCHAS</span><h3>La pregunta y las opciones</h3><p>Con la voz de tu propio móvil. Puedes pedir «repite» o «las opciones» cuando quieras.</p></div>
-        <div class="ficha"><span class="paso">2 · CONTESTAS</span><h3>«La be», «la segunda» o la respuesta</h3><p>Si dudas, di «no sé» o «paso». Si te equivocas, te dice cuál era y por qué, con el artículo.</p></div>
-        <div class="ficha"><span class="paso">3 · REPASAS</span><h3>Lo que fallas vuelve</h3><p>A los pocos minutos y otra vez al día siguiente. Lo que ya sabes sale cada vez menos.</p></div>
+<main>
+  <section class="inicio campo-amarillo">
+    <div>
+      <h1>Haz test de oposiciones sin mirar el móvil.</h1>
+      <p class="entradilla">Te lee la pregunta, contestas en voz alta y lo que fallas vuelve hasta que lo sabes.</p>
+      <div class="accion">
+        <a class="boton" href="estudiar.html">Probar gratis</a>
+        <p class="nota">Sin cuenta y sin instalar nada.</p>
       </div>
-    </section>
+    </div>
+    <figure class="movil" data-voz="[[1.02, 7.06, &quot;voz&quot;, &quot;Te lee la pregunta y las opciones&quot;], [8.11, 8.82, &quot;tu&quot;, &quot;«La a»&quot;], [8.76, 9.89, &quot;voz&quot;, &quot;¡Eso es!&quot;]]">
+        <span class="marco"><video muted playsinline loop preload="auto" src="media/app-emision.mp4" poster="media/app-emision.webp" aria-label="Grabación de la app: una pregunta de la Constitución con sus cuatro opciones; se marca la respuesta simulada."></video></span>
+        <figcaption class="pie-movil">La app de verdad, acelerada y sin sonido; las respuestas están simuladas. <button class="pausar" type="button">Pausar</button></figcaption>
+      </figure>
+  </section>
 
-    <section class="seccion" id="temario">
-      <h2>Qué puedes estudiar</h2>
-      <p class="bajada">La parte general que comparten casi todas las oposiciones: <b id="total-preguntas">1050 preguntas de 7 leyes</b>. Cada pregunta se contrasta, artículo a artículo, con el texto consolidado del BOE antes de publicarse; la que no cuadra, no entra.</p>
+  <nav class="tira" aria-label="Un día de estudio">
+    <ol>
+      <li><a href="#coche"><time>08:10</time> <span class="largo">En el coche</span><span class="corto">Coche</span></a></li>
+      <li><a href="#andando"><time>13:40</time> Andando</a></li>
+      <li><a href="#gimnasio"><time>19:20</time> <span class="largo">En el gimnasio</span><span class="corto">Gimnasio</span></a></li>
+    </ol>
+    <a class="boton boton-tira" href="estudiar.html">Probar<span> gratis</span></a>
+  </nav>
+
+  <article class="momento campo-negro" id="coche">
+    <div class="momento-texto">
+      <h2>En el coche, te pregunta.</h2>
+      <p>Escuchas la pregunta y las cuatro opciones. Contestas «la be», «la segunda» o la respuesta.</p>
+      <p class="aviso-conduce"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 1 21h22L12 2zm0 4.2L19.5 19h-15L12 6.2zM11 10v5h2v-5h-2zm0 6v2h2v-2h-2z"/></svg><span>Pon el móvil en el soporte antes de arrancar y no lo toques en marcha.</span></p>
+    </div>
+    <figure class="movil" data-voz="[[1.42, 3.4, &quot;voz&quot;, &quot;Bien.&quot;], [3.6, 5.6, &quot;voz&quot;, &quot;Bien.&quot;], [5.81, 7.7, &quot;voz&quot;, &quot;No, es la De.&quot;], [7.8, 9.9, &quot;voz&quot;, &quot;Muy bien.&quot;], [10.06, 12.1, &quot;voz&quot;, &quot;Muy bien.&quot;], [12.27, 14, &quot;voz&quot;, &quot;¡Eso es!&quot;]]">
+        <span class="marco"><video muted playsinline loop preload="none" data-src="media/app-sesion.mp4" poster="media/app-sesion.webp" aria-label="Grabación de la app: una tanda de preguntas con respuestas simuladas."></video></span>
+        <figcaption class="pie-movil"><button class="pausar" type="button">Pausar</button></figcaption>
+      </figure>
+  </article>
+
+  <article class="momento al-reves campo-amarillo" id="andando">
+    <div class="momento-texto">
+      <h2>Andando, te corrige.</h2>
+      <p>Si fallas, te dice cuál era y por qué, con su artículo. Esa pregunta vuelve a los pocos minutos y otra vez al día siguiente.</p>
+    </div>
+    <figure class="movil" data-voz="[[0.72, 1.43, &quot;tu&quot;, &quot;«La be»&quot;], [1.38, 2.21, &quot;voz&quot;, &quot;No, es la De.&quot;], [2.21, 6.78, &quot;voz&quot;, &quot;Te dice por qué, con su artículo&quot;]]">
+        <span class="marco"><video muted playsinline loop preload="none" data-src="media/app-fallas.mp4" poster="media/app-fallas.webp" aria-label="Grabación de la app: una respuesta fallada se marca en rojo, la correcta en verde y aparece la explicación con el artículo 17.2."></video></span>
+        <figcaption class="pie-movil"><button class="pausar" type="button">Pausar</button></figcaption>
+      </figure>
+  </article>
+
+  <article class="momento campo-negro" id="gimnasio">
+    <div class="momento-texto">
+      <h2>En el gimnasio, mandas tú.</h2>
+      <p>Le pides lo que quieres, sin tocar la pantalla:</p>
+      <ul class="dichos" data-video="app-ordenes">
+        <li data-desde="0.79" data-hasta="2.2">«Pregúntame de la 39»</li>
+        <li data-desde="7.51" data-hasta="10.2">«Cómo voy»</li>
+        <li>«Las falladas»</li>
+      </ul>
+    </div>
+    <figure class="movil" data-voz="[[0.79, 1.5, &quot;tu&quot;, &quot;«Pregúntame de la 39»&quot;], [1.45, 1.87, &quot;voz&quot;, &quot;Vale, de Ley 39/2015.&quot;], [1.87, 6.95, &quot;voz&quot;, &quot;Te lee la pregunta y las opciones&quot;], [7.51, 8.22, &quot;tu&quot;, &quot;«Cómo voy»&quot;], [8.17, 10.59, &quot;voz&quot;, &quot;Hoy llevas 1 de 2&quot;]]">
+        <span class="marco"><video muted playsinline loop preload="none" data-src="media/app-ordenes.mp4" poster="media/app-ordenes.webp" aria-label="Grabación de la app: cambia de ley y enseña cómo vas, con órdenes simuladas."></video></span>
+        <figcaption class="pie-movil"><button class="pausar" type="button">Pausar</button></figcaption>
+      </figure>
+  </article>
+
+  <section class="tramo temario campo-blanco" id="temario">
+    <div>
+      <h2><b id="total-preguntas">1050 preguntas de 7 leyes</b></h2>
+      <p class="temario-texto">La parte general que comparten casi todas las oposiciones. Cada pregunta se contrasta con el texto consolidado del BOE; la que no cuadra, no entra.</p>
       <ul class="leyes-lista" id="leyes-portada">
         <!-- leyes:inicio -->
         <li><a href="test/constitucion-espanola/">Constitución Española</a> <span class="etiqueta ya">64 preguntas</span></li>
@@ -76,44 +113,38 @@
         <li><a href="test/ley-31-1995-prevencion-riesgos-laborales/">Ley 31/1995 de Prevención de Riesgos Laborales</a> <span class="etiqueta ya">93 preguntas</span></li>
         <!-- leyes:fin -->
       </ul>
-      <p style="margin-top:18px"><a href="test/">Ver los tests por ley y por título, con su respuesta y su artículo →</a></p>
-    </section>
+      <p class="temario-pie"><a href="test/">Ver los tests por ley, con su respuesta y su artículo</a> <span id="temario-fecha" hidden></span></p>
+    </div>
+    <figure class="movil" data-voz="[[0.82, 1.53, &quot;tu&quot;, &quot;«Para»&quot;], [1.48, 2.35, &quot;voz&quot;, &quot;Hoy: 10 preguntas, 8 bien, 2 mal&quot;], [2.35, 3.63, &quot;voz&quot;, &quot;Te dice tu nota con la penalización&quot;], [3.63, 5.07, &quot;voz&quot;, &quot;Las falladas te las vuelvo a sacar&quot;]]">
+        <span class="marco"><video muted playsinline loop preload="none" data-src="media/app-nota.mp4" poster="media/app-nota.webp" aria-label="Grabación de la app: al terminar la tanda muestra la nota, las preguntas vistas y lo que toca repasar."></video></span>
+        <figcaption class="pie-movil">Al terminar, tu nota y lo que te toca repasar. <button class="pausar" type="button">Pausar</button></figcaption>
+      </figure>
+  </section>
 
-    <section class="seccion" id="por-que">
-      <h2>Por qué funciona</h2>
-      <div class="rejilla">
-        <div class="ficha"><h3>Repaso espaciado</h3><p>Cada pregunta vuelve justo cuando estás a punto de olvidarla: tras fallar, a los minutos; tras acertar, a los 3, 7, 16 y 35 días.</p></div>
-        <div class="ficha"><h3>Nota como en el examen</h3><p>Aciertos menos un cuarto por fallo. Y te enseña la estrategia: con cuatro opciones y esa penalización, arriesgar suma a la larga.</p></div>
-        <div class="ficha"><h3>Tiempo muerto que cuenta</h3><p>El trayecto al trabajo, la cinta del gimnasio o el paseo del perro se convierten en una tanda de test.</p></div>
-      </div>
-    </section>
-
-    <section class="seccion">
-      <div class="aviso-coche">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 1 21h22L12 2zm0 4.2L19.5 19h-15L12 6.2zM11 10v5h2v-5h-2zm0 6v2h2v-2h-2z"/></svg>
-        <div><h2 style="font-size:22px;margin:0 0 6px">Si conduces</h2><p style="margin:0;color:var(--suave)">Pon el móvil en el soporte antes de arrancar y no lo toques en marcha: todo funciona con la voz. Si algo falla, para en un sitio seguro.</p></div>
-      </div>
-    </section>
-
-    <section class="seccion preguntas-frecuentes" id="dudas">
-      <h2>Dudas</h2>
+  <section class="tramo dudas campo-blanco" id="dudas">
+    <h2>Dudas</h2>
+    <div class="dudas-lista">
       <details><summary>¿Necesito una cuenta?</summary><p>No. Abres la página y empiezas. Tu progreso se guarda en tu navegador; si cambias de móvil, puedes llevártelo con un código desde Ajustes.</p></details>
       <details><summary>¿Las preguntas son oficiales?</summary><p>No. Son material de estudio propio, escrito a partir del texto de las leyes y comprobado contra el BOE. El texto que vale siempre es el publicado en el BOE.</p></details>
       <details><summary>¿Qué navegador necesito?</summary><p>Para hablarle: Chrome, Edge o Safari. En otros puedes contestar tocando la respuesta. La voz que lee es la de tu propio dispositivo; en Edge y en los móviles suele sonar muy natural.</p></details>
-      <details><summary>¿Quién escucha lo que digo?</summary><p>OposiVoz no graba ni guarda tu voz. El reconocimiento lo hace tu navegador: Chrome y Edge lo procesan en servidores de Google o Microsoft y Safari en Apple. Lo explicamos en la política de privacidad.</p></details>
+      <details><summary>¿Quién escucha lo que digo?</summary><p>OposiVoz no graba ni guarda tu voz. El reconocimiento lo hace tu navegador: Chrome y Edge lo procesan en servidores de Google o Microsoft y Safari en Apple. Lo explicamos en la <a href="privacidad.html">política de privacidad</a>.</p></details>
       <details><summary>¿Cuánto cuesta?</summary><p>Ahora mismo es una beta gratuita. Cuando haya más leyes y oposiciones completas habrá una suscripción; lo que hayas estudiado no se pierde.</p></details>
-    </section>
-  </main>
+    </div>
+  </section>
 
+  <section class="cierre campo-amarillo">
+    <h2>Pulsa y te leo la primera.</h2>
+    <a class="boton" href="estudiar.html">Probar gratis</a>
+  </section>
+</main>
 
-  <footer class="pie">
-    <span>OposiVoz · beta</span>
-    <a href="test/">Tests por ley</a>
-    <a data-opinar href="https://github.com/pab-lit-og/oposivoz/issues/new">Opinar o avisar de un fallo</a>
-    <a href="aviso-legal.html">Aviso legal</a>
-    <a href="privacidad.html">Privacidad</a>
-    <span>Material de estudio no oficial: el texto vigente es el del BOE.</span>
-  </footer>
-</div>
+<footer class="pie">
+  <span>OposiVoz, beta</span>
+  <a href="test/">Tests por ley</a>
+  <a data-opinar href="https://github.com/pab-lit-og/oposivoz/issues/new">Opinar o avisar de un fallo</a>
+  <a href="aviso-legal.html">Aviso legal</a>
+  <a href="privacidad.html">Privacidad</a>
+  <span>Material de estudio no oficial: el texto vigente es el del BOE.</span>
+</footer>
 </body>
 </html>
